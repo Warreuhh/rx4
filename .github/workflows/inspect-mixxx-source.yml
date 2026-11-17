@@ -6,13 +6,17 @@ on:
   workflow_dispatch:
     inputs:
       files:
-        description: "Bestanden (relatief aan de Mixxx-bron), gescheiden door spaties"
-        required: true
-        default: "src/util/rotary.cpp src/util/rotary.h"
-      grep_pattern:
-        description: "Optioneel: regex om in src/ te zoeken (toont bestand en regelnummer)"
+        description: "Bestanden, gescheiden door spaties. Optioneel met regelbereik: pad:begin-eind"
         required: false
         default: ""
+      grep_patterns:
+        description: "Regex-patronen om in src/ en res/ te zoeken, gescheiden door ;; (toont bestand en regelnummer)"
+        required: false
+        default: ""
+      list_dirs:
+        description: "Mappen waarvan de bestandslijst getoond wordt, gescheiden door spaties"
+        required: false
+        default: "src/effects/backends/builtin"
 
 permissions:
   contents: read
@@ -25,23 +29,43 @@ jobs:
       - uses: actions/checkout@v4
       - name: Fetch Mixxx 2.5.6 and apply the patches
         run: |
-          curl -fsSL -o mixxx.tar.gz https://github.com/mixxxdj/mixxx/archive/refs/tags/2.5.6.tar.gz
-          echo "9cfc9025d50d2511767ee52a07b8854f75c581f0585197d043bc219fcf9f9050  mixxx.tar.gz" | sha256sum -c -
+          curl --fail --location --retry 3 https://github.com/mixxxdj/mixxx/archive/refs/tags/2.5.6.tar.gz -o mixxx.tar.gz
+          printf '%s  %s\n' 9cfc9025d50d2511767ee52a07b8854f75c581f0585197d043bc219fcf9f9050 mixxx.tar.gz | sha256sum -c -
           tar xzf mixxx.tar.gz
           cd mixxx-2.5.6
           for p in ../patches/00[0-9][0-9]-*.patch; do GIT_CEILING_DIRECTORIES=.. git apply --no-index "$p"; done
           python3 -I ../fork/apply-rx3-key-column.py .
-      - name: Print the requested files
+      - name: Directory listings
         env:
-          FILES: ${{ inputs.files }}
-          PATTERN: ${{ inputs.grep_pattern }}
+          DIRS: ${{ inputs.list_dirs }}
         run: |
           cd mixxx-2.5.6
-          for f in $FILES; do
-            echo "=================== $f"
-            if [ -f "$f" ]; then cat -n "$f"; else echo "(bestaat niet)"; fi
+          for d in $DIRS; do echo "=================== ls $d"; ls -la "$d" 2>&1 | head -80; done
+      - name: Grep
+        env:
+          PATTERNS: ${{ inputs.grep_patterns }}
+        run: |
+          cd mixxx-2.5.6
+          IFS=$'\n'
+          for pat in $(printf '%s' "$PATTERNS" | sed 's/;;/\n/g'); do
+            [ -z "$pat" ] && continue
+            echo "=================== grep: $pat"
+            grep -rn -E -- "$pat" src res 2>/dev/null | cut -c1-230 | head -150
           done
-          if [ -n "$PATTERN" ]; then
-            echo "=================== grep: $PATTERN"
-            grep -rn -E "$PATTERN" src res 2>/dev/null | cut -c1-220 | head -200
-          fi
+      - name: Print files
+        env:
+          FILES: ${{ inputs.files }}
+        run: |
+          cd mixxx-2.5.6
+          for spec in $FILES; do
+            f="${spec%%:*}"; range=""
+            case "$spec" in *:*) range="${spec#*:}";; esac
+            echo "=================== $spec"
+            if [ ! -f "$f" ]; then echo "(bestaat niet)"; continue; fi
+            if [ -n "$range" ]; then
+              s="${range%-*}"; e="${range#*-}"
+              awk -v s="$s" -v e="$e" 'NR>=s && NR<=e {printf "%6d\t%s\n", NR, $0}' "$f"
+            else
+              cat -n "$f"
+            fi
+          done
