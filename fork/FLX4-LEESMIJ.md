@@ -1,4 +1,6 @@
-# FLX4 voor NauticMixxx, versie 2.4
+# FLX4 voor NauticMixxx, versie 2.5
+
+Versie 2.5: de standen van knoppen en schuiven worden bij het opstarten opgehaald en toegepast, de tempo-schuif volgt de schuif zelf (ook na het laden van een liedje), en SMART FADER zet de crossfader uit en aan. Versie 2.4 (jog, EQ, CFX, SMART CFX, sync) staat hieronder.
 
 Versie 2.3: SHIFT + BROWSE (kort) is nu BACK, en draaien aan BROWSE in het deck-beeld zoomt de golfvormen in plaats van de browser te openen. TRIM blijft op -6 dB bij 12 uur (zoals versie 2.2).
 
@@ -10,7 +12,18 @@ Voorbereiding: sluit NauticMixxx, vervang de twee bestanden in `%LOCALAPPDATA%\N
 
 **Belangrijk: kies de mapping zelf.** NauticMixxx start standaard met zijn eigen FLX4-preset, niet met deze. Ctrl+P, **Controllers**, **DDJ-FLX4**, bij **Load Mapping** kies je **Pioneer DDJ-FLX4 - NauticMixxx (eigen)**, **Enabled** aan, **Apply**, **OK**. Daarna NauticMixxx één keer sluiten en weer starten en kijken of hij er nog staat.
 
-**Nieuw in 2.4 (test deze eerst):**
+**Nieuw in 2.5 (test deze eerst):**
+
+| # | Wat je doet | Wat je hoort te zien |
+|---|---|---|
+| G | Zet **voor** het starten alles op duidelijke standen: TRIM op driekwart, een EQ-knop helemaal rechts, de CFX-knop links, beide tempo-schuiven op ongeveer +3%, een kanaalfader half. Start dan NauticMixxx met de FLX4 aangesloten en kijk een seconde na het opstarten naar het scherm, **zonder iets aan te raken** | De knoppen en schuiven op het scherm staan zoals de hardware (trim, EQ, CFX, kanaalfaders, crossfader, tempo). Lukt dit niet: open `mixxx.log` en zoek `STARTSTANDEN`. Die regel telt wat de controller binnen 4 seconden doorgaf, per soort. Staat overal 0, dan meldt de FLX4 zijn standen niet na de vraag, en kan geen software het oplossen (zie hieronder) |
+| H | Zet een tempo-schuif op +4% (sync uit) en laad een liedje op dat deck | Het liedje start op het tempo van de schuif, zonder dat je de schuif eerst langs het midden hoeft te halen. Is sync aan, dan blijft het tempo van sync |
+| I | Raak een tempo-schuif voor het eerst aan (als G de stand niet doorgaf) | Het tempo springt meteen naar de stand van de schuif; daarna werkt de schuif normaal |
+| J | Druk op **SMART FADER** | De crossfader doet niets meer (zoals de THRU-stand van een mixer). Nog een keer drukken zet hem weer aan. Staat in `mixxx.log`: `crossfader UIT (THRU)` of `AAN`. Doet de knop niets: druk een keer op hem en stuur me de regel met `ONBEKENDE KNOP` |
+
+De knopadres van SMART FADER is, net als dat van SMART CFX, nergens openbaar; ik heb een gok erin gezet. Heb je met SMART FADER iets anders bedoeld (bijvoorbeeld het effect dat meekomt als je de fader dichtschuift), zeg het dan.
+
+**Nog niet bevestigd uit 2.4:**
 
 | # | Wat je doet | Wat je hoort te zien |
 |---|---|---|
@@ -21,7 +34,7 @@ Voorbereiding: sluit NauticMixxx, vervang de twee bestanden in `%LOCALAPPDATA%\N
 | E | Als D niets doet: druk **een keer** op elke SMART CFX-knop, open `mixxx.log` en zoek `ONBEKENDE KNOP` | Er staat een regel met `status=0x96 noot=0x..`; stuur me die regels. De knopadressen van de FLX4 zijn nergens openbaar, dus ik heb er twee gokken in gezet |
 | F | Zet sync op deck 1 aan met BEAT SYNC, laad daarna een ander liedje op deck 1 | De sync-knop staat na het laden uit en het nieuwe liedje start op zijn eigen tempo. Alleen BEAT SYNC zet sync weer aan |
 
-Instellingen voor dit alles staan bovenin het scriptbestand (`jogReleaseRamp`, `eqMode`, `eqCutDb`, `eqBoostDb`, `cfxDeadzone`, `smartCfxKeys`, `syncOnLoad`). Zet `eqMode` op `"mixxx"` voor de oude EQ.
+Instellingen voor dit alles staan bovenin het scriptbestand (`jogReleaseRamp`, `eqMode`, `eqCutDb`, `eqBoostDb`, `cfxDeadzone`, `smartCfxKeys`, `smartFaderKeys`, `syncOnLoad`, `startupSync`, `startupWindowMs`, `tempoFollowSlider`, `tempoLoadDelayMs`). Zet `eqMode` op `"mixxx"` voor de oude EQ.
 
 **Eerder, in 2.3:**
 
@@ -49,6 +62,8 @@ Daarna blijft de testlijst van versie 1 gelden (BROWSE, LOAD, SHIFT + LOAD, PLAY
 
 ## Wat ik niet in de mapping kan oplossen
 
+**Standen bij het opstarten.** Software kan de stand van een draaiknop of schuif alleen weten als de controller hem doorgeeft. De mapping stuurt bij het starten dezelfde vraag als rekordbox (de SysEx die uit Wireshark komt, elke 200 ms herhaald), en past alles toe wat terugkomt. Antwoordt jouw FLX4 daar niet op, dan blijft het bij de eerste beweging: dat is dan een eigenschap van de hardware, geen fout in de mapping. De regel `STARTSTANDEN` in `mixxx.log` laat zien welke van de twee het is.
+
 **KEY-kolom, regelnummers en key in de playlist-preview.** De kolommen van de tracklijst (PREVIEW, TRACK, ARTIST, BPM, GENRE) en de tekst van de playlist-preview zitten vast ingebakken in de programmacode van NauticMixxx. Een mapping of skin kan daar niets aan veranderen, en de NauticMixxx die nu op je pc staat is een kant-en-klaar programma, dus dit kan ik **niet** in die versie zetten. Wel heb ik de wijziging al klaar voor de volgende build (de Raspberry Pi, of een nieuwe Windows-build): `source-patch/apply-rx3-key-column.py`. Dat geeft de kolommen **# PREVIEW TRACK ARTIST BPM KEY GENRE**, en in de playlist-preview staat voor elke track eerst de toonsoort. Ik heb dat script getest op een nagemaakte versie van de code. Compileren kon ik hier niet, dus de eerste echte build laat zien of het zonder fouten door komt.
 
 De notatie van de toonsoort (1A tot 12B, het Camelot-wiel) stel je in NauticMixxx zelf in: Ctrl+P, **Key Detection**, **Key notation: Lancelot**. Dat is in Mixxx de naam voor Camelot. Nu staat die op *Traditional* (Am, F#m, enzovoort).
@@ -59,7 +74,7 @@ Wat nu al kan: links in de lijst staat **KEY** tussen de categorieën om op toon
 
 **Audio buffer.** Zet de buffer niet op 11 ms. In het log eindigt NauticMixxx precies op het moment dat die waarde werd toegepast (20:36), waarschijnlijk een crash van het geluidsstuurprogramma. 23 ms is veilig.
 
-**Geluid stiller dan rekordbox.** NauticMixxx gebruikt voor de FLX4 de geluids-API **MME**. Die loopt via de Windows-volumeregeling, rekordbox gebruikt het eigen ASIO-stuurprogramma van Pioneer en omzeilt Windows. Controleer: Windows, **Instellingen, Systeem, Geluid**, uitvoerapparaat **Line (2- DDJ-FLX4)**, volume op **100%**. Kijk ook in het **Volumemixer** of NauticMixxx daar niet lager staat. En zet de **MASTER LEVEL**-knop van de FLX4 vergelijkbaar met hoe je hem bij rekordbox hebt. Is het daarna nog stil, probeer dan in NauticMixxx (Ctrl+P, Sound Hardware) de **Sound API** "Windows WASAPI" als die in de lijst staat.
+**Geluid stiller of minder goed dan rekordbox.** NauticMixxx gebruikt voor de FLX4 de geluids-API **MME**. Die loopt via de Windows-volumeregeling, rekordbox gebruikt het eigen ASIO-stuurprogramma van Pioneer en omzeilt Windows. Controleer: Windows, **Instellingen, Systeem, Geluid**, uitvoerapparaat **Line (2- DDJ-FLX4)**, volume op **100%**. Kijk ook in het **Volumemixer** of NauticMixxx daar niet lager staat. En zet de **MASTER LEVEL**-knop van de FLX4 vergelijkbaar met hoe je hem bij rekordbox hebt. Is het daarna nog stil, probeer dan in NauticMixxx (Ctrl+P, Sound Hardware) de **Sound API** "Windows WASAPI" als die in de lijst staat.
 
 ## Installatie (eerste keer)
 

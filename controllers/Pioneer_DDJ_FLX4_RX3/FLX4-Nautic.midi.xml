@@ -3,7 +3,7 @@
     <info>
         <name>Pioneer DDJ-FLX4 - NauticMixxx (eigen)</name>
         <author>Eigen mapping voor NauticMixxx, gebaseerd op Pioneer DDJ-FLX4 (Robert904 e.a.) en NauticMixxx' FLX4-bestanden</author>
-        <description>Pioneer DDJ-FLX4 voor NauticMixxx (versie 2.4): BROWSE, LOAD, Beat FX, CFX, SMART CFX, EQ (Pioneer-curve), TRIM, PLAY (vinyl-stop) en pad-pagina's volgens de RX3-skin.</description>
+        <description>Pioneer DDJ-FLX4 voor NauticMixxx (versie 2.5): BROWSE, LOAD, Beat FX, CFX, SMART CFX, SMART FADER, EQ (Pioneer-curve), TRIM, tempo-schuif, startstanden, PLAY (vinyl-stop) en pad-pagina's volgens de RX3-skin.</description>
     </info>
     <controller id="DDJ-FLX4">
         <scriptfiles>

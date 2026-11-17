@@ -967,7 +967,21 @@ FLX4RX3.options = {
     // openbaar; lukt het niet, druk een keer op de knop en zoek in mixxx.log naar
     // "ONBEKENDE KNOP", dan zet ik het juiste adres hier neer.
     smartCfxKeys: [0x9651, 0x9609],
+    // SMART FADER: zet de crossfader uit (THRU: geen kanaal hangt nog aan links of rechts) en
+    // weer aan. Ook dit adres is niet openbaar; staat het verkeerd, druk een keer op de knop en
+    // zoek in mixxx.log naar "ONBEKENDE KNOP".
+    smartFaderKeys: [0x9601],
     logUnknownButtons: true,
+    // Standen bij het opstarten: de mapping vraagt de controller bij het starten naar de stand
+    // van alle knoppen en schuiven. Binnen dit venster (ms) telt mixxx.log wat er binnenkwam
+    // ("STARTSTANDEN"), en volgt het tempo meteen de schuif (zonder soft-takeover).
+    startupSync: true,
+    startupWindowMs: 4000,
+    // Tempo-schuif: de stand van de schuif is het tempo. Bij het opstarten, bij de eerste
+    // beweging en na het laden van een liedje springt het tempo naar de schuif (zoals bij
+    // Pioneer). Is sync aan, dan blijft soft-takeover gelden. false = zoals standaard Mixxx.
+    tempoFollowSlider: true,
+    tempoLoadDelayMs: 150,
     // Sync na het laden van een liedje: "off" = sync gaat uit (alleen BEAT SYNC zet hem aan; het
     // nieuwe liedje start op zijn eigen tempo), "keep" = zoals Mixxx (sync blijft aan).
     syncOnLoad: "off",
@@ -1271,6 +1285,135 @@ FLX4RX3.skinPadMode = function(deckNumber, control) {
     }
 };
 
+// ---- Standen bij het opstarten ----------------------------------------------------------
+// De FLX4 stuurt zijn knop- en schuifstanden pas door na de SysEx-vraag uit init (en anders bij
+// de eerste beweging). Tijdens het venster telt deze code wat er binnenkomt en schrijft een
+// samenvatting naar mixxx.log; zo is te zien of de controller zijn standen echt meldt.
+FLX4RX3.startup = {active: false, seen: {}, connections: [], timer: 0};
+
+FLX4RX3.startupNote = function(kind) {
+    if (!FLX4RX3.startup.active) { return; }
+    FLX4RX3.startup.seen[kind] = (FLX4RX3.startup.seen[kind] || 0) + 1;
+};
+
+FLX4RX3.startupStop = function() {
+    const s = FLX4RX3.startup;
+
+    s.active = false;
+    if (s.timer) { engine.stopTimer(s.timer); s.timer = 0; }
+    s.connections.forEach(function(c) { if (c && c.disconnect) { c.disconnect(); } });
+    s.connections = [];
+};
+
+FLX4RX3.startupReport = function() {
+    const seen = FLX4RX3.startup.seen;
+    const kinds = ["trim", "eq", "cfx", "tempo", "fader", "crossfader"];
+    let total = 0;
+    const parts = kinds.map(function(k) { total += seen[k] || 0; return k + " " + (seen[k] || 0); });
+
+    FLX4RX3.startup.timer = 0;
+    FLX4RX3.startupStop();
+    FLX4RX3.log("STARTSTANDEN binnen " + FLX4RX3.options.startupWindowMs + " ms van de controller: " + parts.join(", ") +
+        (total > 0 ? "" : " -> de controller meldt geen standen na de vraag; regelaars nemen over bij de eerste beweging"));
+};
+
+FLX4RX3.startStartupSync = function() {
+    const s = FLX4RX3.startup;
+
+    if (!FLX4RX3.options.startupSync) { return; }
+    s.active = true;
+    s.seen = {};
+    [["[Channel1]", "volume", "fader"], ["[Channel2]", "volume", "fader"], ["[Master]", "crossfader", "crossfader"]].forEach(
+        function(item) {
+            s.connections.push(engine.makeConnection(item[0], item[1], function() { FLX4RX3.startupNote(item[2]); }));
+        });
+    s.timer = engine.beginTimer(FLX4RX3.options.startupWindowMs, FLX4RX3.startupReport, true);
+};
+
+// ---- Tempo-schuif: de schuif is het tempo -----------------------------------------------
+// Mixxx negeert met soft-takeover de eerste waarde van een schuif en daarna alles tot de schuif
+// langs de huidige stand komt: je moet dus eerst aan de schuif draaien. Bij Pioneer is de stand
+// van de schuif gewoon het tempo. Hier springt het tempo naar de schuif bij het opstarten, bij
+// de eerste beweging en na het laden van een liedje. Staat sync aan, dan blijft soft-takeover.
+FLX4RX3.tempoLsbState = {};
+FLX4RX3.tempoLoadTimers = {};
+
+FLX4RX3.tempoSliderMSB = function(_channel, _control, value, _status, group) {
+    FLX4RX3.highResMSB[group].tempoSlider = value;
+};
+
+FLX4RX3.tempoRateFromSlider = function(group) {
+    const msb = FLX4RX3.highResMSB[group].tempoSlider;
+    const lsb = FLX4RX3.tempoLsbState[group];
+
+    if (msb === undefined || lsb === undefined) { return null; }
+    return 1 - (((msb << 7) + lsb) / 0x2000);
+};
+
+FLX4RX3.setRateDirect = function(group, rate) {
+    engine.softTakeover(group, "rate", false);
+    engine.setValue(group, "rate", rate);
+    engine.softTakeover(group, "rate", true);
+};
+
+FLX4RX3.tempoSliderLSB = function(_channel, _control, value, _status, group) {
+    const known = FLX4RX3.tempoLsbState[group] !== undefined;
+
+    FLX4RX3.startupNote("tempo");
+    FLX4RX3.tempoLsbState[group] = value;
+
+    const rate = FLX4RX3.tempoRateFromSlider(group);
+    const follow = FLX4RX3.options.tempoFollowSlider &&
+        (FLX4RX3.startup.active || (!known && engine.getValue(group, "sync_enabled") <= 0));
+
+    if (rate === null) { return; }
+    if (follow) {
+        FLX4RX3.setRateDirect(group, rate);
+    } else {
+        engine.setValue(group, "rate", rate);
+    }
+};
+
+FLX4RX3.trackLoadedTempo = function(value, group) {
+    if (value <= 0 || !FLX4RX3.options.tempoFollowSlider) { return; }
+    if (FLX4RX3.tempoLoadTimers[group]) { engine.stopTimer(FLX4RX3.tempoLoadTimers[group]); }
+
+    FLX4RX3.tempoLoadTimers[group] = engine.beginTimer(FLX4RX3.options.tempoLoadDelayMs, function() {
+        const rate = FLX4RX3.tempoRateFromSlider(group);
+
+        FLX4RX3.tempoLoadTimers[group] = 0;
+        if (rate === null || engine.getValue(group, "sync_enabled") > 0) { return; }
+        FLX4RX3.setRateDirect(group, rate);
+        FLX4RX3.log("tempo na laden op " + group + " = stand van de schuif");
+    }, true);
+};
+
+// ---- SMART FADER: crossfader aan/uit ----------------------------------------------------
+FLX4RX3.xfade = {off: false, saved: {}};
+FLX4RX3.xfadeDefaults = {"[Channel1]": 0, "[Channel2]": 2};
+
+FLX4RX3.xfadeRestore = function() {
+    Object.keys(FLX4RX3.xfadeDefaults).forEach(function(group) {
+        const saved = FLX4RX3.xfade.saved[group];
+
+        engine.setValue(group, "orientation", saved !== undefined && saved !== 1 ? saved : FLX4RX3.xfadeDefaults[group]);
+    });
+    FLX4RX3.xfade.off = false;
+};
+
+FLX4RX3.smartFaderPressed = function() {
+    if (FLX4RX3.xfade.off) {
+        FLX4RX3.xfadeRestore();
+    } else {
+        Object.keys(FLX4RX3.xfadeDefaults).forEach(function(group) {
+            FLX4RX3.xfade.saved[group] = engine.getValue(group, "orientation");
+            engine.setValue(group, "orientation", 1);
+        });
+        FLX4RX3.xfade.off = true;
+    }
+    FLX4RX3.log("crossfader " + (FLX4RX3.xfade.off ? "UIT (THRU)" : "AAN"));
+};
+
 // ---- Start en stop ---------------------------------------------------------------
 FLX4RX3.initRx3 = function() {
     // Altijd slot 1 als Beat FX-effect; LED volgt effect + unit
@@ -1280,6 +1423,12 @@ FLX4RX3.initRx3 = function() {
     // Sync gaat uit bij het laden van een liedje
     engine.makeConnection("[Channel1]", "track_loaded", FLX4RX3.trackLoadedSync);
     engine.makeConnection("[Channel2]", "track_loaded", FLX4RX3.trackLoadedSync);
+    // Het tempo volgt daarna de schuif (de volgorde is belangrijk: eerst sync uit, dan tempo)
+    engine.makeConnection("[Channel1]", "track_loaded", FLX4RX3.trackLoadedTempo);
+    engine.makeConnection("[Channel2]", "track_loaded", FLX4RX3.trackLoadedTempo);
+
+    // Standen van de controller ophalen en tellen (de SysEx-vraag is al verstuurd in init)
+    FLX4RX3.startStartupSync();
 
     // NauticMixxx zet zijn gebruikersinstellingen terug nadat de mapping klaar is
     FLX4RX3.enc.init();
@@ -1333,11 +1482,13 @@ FLX4RX3.trimApply = function(group) {
 };
 
 FLX4RX3.trimMsb = function(_channel, _control, value, _status, group) {
+    FLX4RX3.startupNote("trim");
     FLX4RX3.trimState.msb[group] = value;
     FLX4RX3.trimApply(group);
 };
 
 FLX4RX3.trimLsb = function(_channel, _control, value, _status, group) {
+    FLX4RX3.startupNote("trim");
     FLX4RX3.trimState.lsb[group] = value;
     FLX4RX3.trimApply(group);
 };
@@ -1408,6 +1559,7 @@ FLX4RX3.eqApply = function(group, band, id) {
 };
 
 FLX4RX3.eqMsb = function(_channel, control, value, _status, group) {
+    FLX4RX3.startupNote("eq");
     const band = FLX4RX3.eqBand[control];
     const id = group + band;
 
@@ -1416,6 +1568,7 @@ FLX4RX3.eqMsb = function(_channel, control, value, _status, group) {
 };
 
 FLX4RX3.eqLsb = function(_channel, control, value, _status, group) {
+    FLX4RX3.startupNote("eq");
     const band = FLX4RX3.eqBand[control];
     const id = group + band;
 
@@ -1443,11 +1596,13 @@ FLX4RX3.cfxApply = function(group) {
 };
 
 FLX4RX3.cfxMsb = function(_channel, _control, value, _status, group) {
+    FLX4RX3.startupNote("cfx");
     FLX4RX3.cfxState.msb[group] = value;
     FLX4RX3.cfxApply(group);
 };
 
 FLX4RX3.cfxLsb = function(_channel, _control, value, _status, group) {
+    FLX4RX3.startupNote("cfx");
     FLX4RX3.cfxState.lsb[group] = value;
     FLX4RX3.cfxApply(group);
 };
@@ -1493,6 +1648,10 @@ FLX4RX3.unmappedButton = function(_channel, control, value, status, _group) {
         FLX4RX3.smartCfxPressed();
         return;
     }
+    if (FLX4RX3.options.smartFaderKeys.indexOf(key) >= 0) {
+        FLX4RX3.smartFaderPressed();
+        return;
+    }
     if (FLX4RX3.options.logUnknownButtons) {
         FLX4RX3.log("ONBEKENDE KNOP status=0x" + (status & 0xFF).toString(16) + " noot=0x" + (control & 0xFF).toString(16));
     }
@@ -1515,6 +1674,8 @@ FLX4RX3.trackLoadedSync = function(value, group) {
 
 
 FLX4RX3.shutdownRx3 = function() {
+    FLX4RX3.startupStop();
+    if (FLX4RX3.xfade.off) { FLX4RX3.xfadeRestore(); }
     FLX4RX3.cancelFxRestore();
     if (FLX4RX3.skinState.initTimer) {
         engine.stopTimer(FLX4RX3.skinState.initTimer);

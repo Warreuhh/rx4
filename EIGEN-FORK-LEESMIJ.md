@@ -2,15 +2,15 @@
 
 Dit is een kopie van de NauticMixxx 2.0.0-bron met onze eigen wijzigingen erbovenop. GitHub bouwt er een installer (Windows) en een pakket (Raspberry Pi) van. Wij hoeven niets zelf te compileren.
 
-## Testlijst voor versie 2.4 (jog, EQ, CFX, SMART CFX, sync)
+## Testlijst voor versie 2.5 (startstanden, tempo-schuif, SMART FADER)
 
-Eerst de bouw: de nieuwe C++-regel voor de jog-uitloop is nog nooit gecompileerd. Gaat de bouw rood, stuur me dan het log.
+De bouw is dit keer alleen anders in de FLX4-mapping (JavaScript); er is niets nieuws om te compileren.
 
 | # | Wat je doet | Wat je hoort te zien |
 |---|---|---|
-| 1 | Installeer de nieuwe `...-Setup.exe` uit de Actions-run | Het programma start |
+| 1 | Het programma staat al op je pc; je hoeft alleen de twee bestanden uit de zip te vervangen (of de nieuwe `...-Setup.exe` uit de Actions-run te installeren) | Het programma start; bij Controllers staat de mapping als versie 2.5 |
 | 2 | Duw een jogwheel vooruit en laat los. Probeer ook de rand van het wiel (zonder aanraking van de bovenkant) | Geen uitrollen meer na loslaten: de software staat stil op het moment dat het wiel stilstaat |
-| 3 | De overige punten staan in de tabel van de mapping hieronder (A tot F): EQ, CFX, SMART CFX en sync | Zie `fork/FLX4-LEESMIJ.md` |
+| 3 | De overige punten staan in de tabel van de mapping: G tot J voor 2.5 (startstanden, tempo, SMART FADER) en A tot F voor 2.4 (EQ, CFX, SMART CFX, sync) | Zie `fork/FLX4-LEESMIJ.md` |
 
 ## Eerdere testlijst (versie 2.3, niet allemaal bevestigd)
 
