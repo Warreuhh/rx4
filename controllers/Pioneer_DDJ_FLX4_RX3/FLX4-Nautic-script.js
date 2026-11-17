@@ -972,6 +972,17 @@ FLX4RX3.options = {
     // weer aan. Ook dit adres is niet openbaar; staat het verkeerd, druk een keer op de knop en
     // zoek in mixxx.log naar "ONBEKENDE KNOP".
     smartFaderKeys: [0x9601],
+    // SMART CFX slaat "geen keten" (nummer 0) over en houdt beide kanalen op dezelfde keten.
+    cfxPresetCount: 4,
+    cfxNames: ["REVERB", "PING PONG", "NOISE", "FILTER"],
+    // Sync alleen met BEAT SYNC: "block" = sync die aangaat zonder BEAT SYNC-druk (binnen syncGuardMs)
+    // gaat meteen weer uit en komt in mixxx.log; "log" = alleen melden; "off" = niets doen.
+    // Let op: dan werkt ook de sync-knop op het scherm of het toetsenbord niet meer.
+    syncGuard: "block",
+    syncGuardMs: 1500,
+    // Opstart: wat init() deed en Mixxx weggooide (de laadanimatie van de jogs) wordt bij de eerste
+    // echte keep-alive opnieuw verstuurd, in dezelfde volgorde als de standaardmapping, vlak voor de vraag.
+    startupReplay: true,
     logUnknownButtons: true,
     // Standen bij het opstarten: de mapping vraagt de controller bij het starten naar de stand
     // van alle knoppen en schuiven. Binnen dit venster (ms) telt mixxx.log wat er binnenkwam
@@ -1321,6 +1332,9 @@ FLX4RX3.startupReport = function() {
 
     s.timer = 0;
     FLX4RX3.startupStop();
+    ["[Channel1]", "[Channel2]"].forEach(function(g) {
+        FLX4RX3.trackLoadedLED(engine.getValue(g, "track_loaded"), g);
+    });
     FLX4RX3.log("STARTSTANDEN binnen " + FLX4RX3.options.startupWindowMs + " ms na de eerste vraag: " + parts.join(", ") +
         (total > 0 ? " (eerste antwoord na " + first + " ms)" :
             " -> de controller meldt geen standen na de vraag; regelaars nemen over bij de eerste beweging"));
@@ -1351,6 +1365,14 @@ FLX4RX3.startupAnchor = function() {
 
 // De vraag aan de controller (uit Wireshark, ongewijzigd); doet ook dienst als keep-alive.
 FLX4RX3.sendKeepAlive = function() {
+    const firstReal = FLX4RX3.startup.armed;
+
+    if (firstReal && FLX4RX3.options.startupReplay) {
+        // Dit deed init() ook, maar Mixxx gooide het weg. Zelfde volgorde als de standaardmapping:
+        // eerst de laadanimatie van de twee jogs, dan de vraag.
+        midi.sendShortMsg(0x9F, 0x00, 0x7F);
+        midi.sendShortMsg(0x9F, 0x01, 0x7F);
+    }
     midi.sendSysexMsg([0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x05, 0x00, 0x50, 0x02, 0xf7], 12);
     FLX4RX3.startupAnchor();
 };
@@ -1445,6 +1467,9 @@ FLX4RX3.initRx3 = function() {
     engine.setValue(FLX4RX3.fxUnit, "focused_effect", 1);
     engine.makeConnection(FLX4RX3.fxUnit, "enabled", FLX4RX3.toggleFxLight);
 
+    // Sync gaat alleen aan met BEAT SYNC
+    engine.makeConnection("[Channel1]", "sync_enabled", FLX4RX3.syncGuard);
+    engine.makeConnection("[Channel2]", "sync_enabled", FLX4RX3.syncGuard);
     // Sync gaat uit bij het laden van een liedje
     engine.makeConnection("[Channel1]", "track_loaded", FLX4RX3.trackLoadedSync);
     engine.makeConnection("[Channel2]", "track_loaded", FLX4RX3.trackLoadedSync);
@@ -1634,24 +1659,48 @@ FLX4RX3.cfxLsb = function(_channel, _control, value, _status, group) {
 
 // ---- SMART CFX: de CFX-keten kiezen ---------------------------------------------------
 // Keten 1 REVERB, 2 PING PONG, 3 NOISE, 4 FILTER (NauticMixxx' lijst met Sound Color FX).
+// Nummer 0 is "geen keten": die slaan we over. Beide kanalen blijven op dezelfde keten; de
+// naam staat linksboven in de balk van het scherm (CFX ...).
+FLX4RX3.cfxGroup = function(deck) { return "[QuickEffectRack1_[Channel" + deck + "]]"; };
+
+FLX4RX3.cfxName = function(preset) {
+    return FLX4RX3.options.cfxNames[preset - 1] || ("KETEN " + preset);
+};
+
+FLX4RX3.cfxValid = function(preset) {
+    return preset >= 1 && preset <= FLX4RX3.options.cfxPresetCount;
+};
+
+FLX4RX3.cfxCheck = function(direction, tries) {
+    const key = direction > 0 ? "next_chain_preset" : "prev_chain_preset";
+    const p1 = engine.getValue(FLX4RX3.cfxGroup(1), "loaded_chain_preset");
+    const p2 = engine.getValue(FLX4RX3.cfxGroup(2), "loaded_chain_preset");
+    let again = false;
+
+    if (!FLX4RX3.cfxValid(p1)) {
+        FLX4RX3.pulseValue(FLX4RX3.cfxGroup(1), key, 1);
+        again = true;
+    } else if (p2 !== p1) {
+        FLX4RX3.pulseValue(FLX4RX3.cfxGroup(2), key, 1);
+        again = true;
+    }
+    if (again && tries < 8) {
+        engine.beginTimer(60, function() { FLX4RX3.cfxCheck(direction, tries + 1); }, true);
+        return;
+    }
+    for (let deck = 1; deck <= 2; ++deck) {
+        engine.setValue(FLX4RX3.cfxGroup(deck), "enabled", 1);
+    }
+    FLX4RX3.log("SMART CFX: keten " + p1 + " " + FLX4RX3.cfxName(p1) + (p1 === p2 ? "" : " (kanaal 2: " + p2 + ")"));
+};
+
 FLX4RX3.smartCfxStep = function(direction) {
     const key = direction > 0 ? "next_chain_preset" : "prev_chain_preset";
 
-    for (let deck = 1; deck <= 2; ++deck) {
-        const group = "[QuickEffectRack1_[Channel" + deck + "]]";
-
-        FLX4RX3.pulseValue(group, key, 1);
-    }
-    // Een nieuwe keten kan uitstaan: zet hem na het laden weer aan.
-    engine.beginTimer(80, function() {
-        for (let deck = 1; deck <= 2; ++deck) {
-            const group = "[QuickEffectRack1_[Channel" + deck + "]]";
-
-            engine.setValue(group, "enabled", 1);
-        }
-        FLX4RX3.log("SMART CFX: keten " + engine.getValue("[QuickEffectRack1_[Channel1]]", "loaded_chain_preset") +
-            " (1 REVERB, 2 PING PONG, 3 NOISE, 4 FILTER)");
-    }, true);
+    FLX4RX3.pulseValue(FLX4RX3.cfxGroup(1), key, 1);
+    FLX4RX3.pulseValue(FLX4RX3.cfxGroup(2), key, 1);
+    // De nieuwe keten laadt even later; controleer dan of hij niet "geen keten" is en gelijk loopt.
+    engine.beginTimer(80, function() { FLX4RX3.cfxCheck(direction, 0); }, true);
 };
 
 FLX4RX3.smartCfxPressed = function() {
@@ -1680,6 +1729,71 @@ FLX4RX3.unmappedButton = function(_channel, control, value, status, _group) {
     if (FLX4RX3.options.logUnknownButtons) {
         FLX4RX3.log("ONBEKENDE KNOP status=0x" + (status & 0xFF).toString(16) + " noot=0x" + (control & 0xFF).toString(16));
     }
+};
+
+// ---- BEAT SYNC en de bewaking: sync gaat alleen aan met de knop --------------------------
+FLX4RX3.syncAllowed = {};
+
+FLX4RX3.syncMark = function(group) {
+    FLX4RX3.syncAllowed[group] = Date.now();
+};
+
+// Na een BEAT SYNC-druk: schrijf de stand van beide decks in mixxx.log, zodat te zien is hoe
+// goed tempo en fase overeenkomen (verschil in ms op basis van de beat-afstand van beide decks).
+FLX4RX3.syncReport = function(group) {
+    const other = group === "[Channel1]" ? "[Channel2]" : "[Channel1]";
+    const info = function(g) {
+        return g + " play=" + engine.getValue(g, "play") + " bpm=" + engine.getValue(g, "bpm").toFixed(2) +
+            " (bestand " + engine.getValue(g, "file_bpm").toFixed(2) + ")" +
+            " tempo=" + engine.getValue(g, "rate_ratio").toFixed(4) +
+            " sync_mode=" + engine.getValue(g, "sync_mode") +
+            " beat_afstand=" + engine.getValue(g, "beat_distance").toFixed(3);
+    };
+    let phase = engine.getValue(group, "beat_distance") - engine.getValue(other, "beat_distance");
+    const bpm = engine.getValue(group, "bpm");
+
+    phase = phase - Math.round(phase);
+    FLX4RX3.log("SYNC-METING: " + info(group) + " | " + info(other) + " | fase-verschil " +
+        (bpm > 0 ? (phase * 60000 / bpm).toFixed(1) + " ms" : "?") +
+        " quantize=" + engine.getValue(group, "quantize"));
+};
+
+FLX4RX3.syncReportLater = function(group) {
+    engine.beginTimer(700, function() { FLX4RX3.syncReport(group); }, true);
+};
+
+FLX4RX3.syncPressed = function(_channel, _control, value, _status, group) {
+    if (value <= 0 || engine.getValue(group, "rx3_source_lost")) { return; }
+    if (engine.getValue(group, "sync_enabled")) {
+        engine.setValue(group, "sync_enabled", 0);
+        FLX4RX3.log("BEAT SYNC uit op " + group);
+    } else {
+        FLX4RX3.syncMark(group);
+        engine.setValue(group, "sync_enabled", 1);
+        engine.setValue(group, "beatsync_phase", 1);
+        FLX4RX3.log("BEAT SYNC aan op " + group);
+        FLX4RX3.syncReportLater(group);
+    }
+};
+
+FLX4RX3.syncLongPressed = function(_channel, _control, value, _status, group) {
+    if (value) {
+        FLX4RX3.syncMark(group);
+        engine.setValue(group, "sync_enabled", 1);
+        FLX4RX3.log("BEAT SYNC (lang) op " + group);
+        FLX4RX3.syncReportLater(group);
+    }
+};
+
+// Verbonden met sync_enabled van beide decks: gaat sync aan zonder dat BEAT SYNC net is ingedrukt,
+// dan meldt de mapping dat en zet hij sync weer uit (zie syncGuard).
+FLX4RX3.syncGuard = function(value, group) {
+    const mode = FLX4RX3.options.syncGuard;
+
+    if (value <= 0 || mode === "off") { return; }
+    if (Date.now() - (FLX4RX3.syncAllowed[group] || 0) <= FLX4RX3.options.syncGuardMs) { return; }
+    FLX4RX3.log("sync aangegaan op " + group + " zonder BEAT SYNC" + (mode === "block" ? ": weer uit" : ""));
+    if (mode === "block") { engine.setValue(group, "sync_enabled", 0); }
 };
 
 // ---- Sync alleen met BEAT SYNC ----------------------------------------------------------

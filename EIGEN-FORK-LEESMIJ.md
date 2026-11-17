@@ -2,9 +2,24 @@
 
 Dit is een kopie van de NauticMixxx 2.0.0-bron met onze eigen wijzigingen erbovenop. GitHub bouwt er een installer (Windows) en een pakket (Raspberry Pi) van. Wij hoeven niets zelf te compileren.
 
-## Testlijst voor versie 2.6 (startstanden, tempo-schuif, SMART CFX, SMART FADER)
+## Testlijst voor versie 2.7 (fase bij PLAY, tracknummers, CFX-naam, BEAT SYNC, startstanden)
 
-De bouw is dit keer alleen anders in de FLX4-mapping (JavaScript); er is niets nieuws om te compileren.
+Deze versie bevat nieuwe programmacode (C++) en een aangepaste skin. Je hebt dus **een nieuwe installer** nodig: start in GitHub, tabblad **Actions**, de workflow **NauticMixxx Windows x64**, wacht tot er een groen vinkje staat en installeer de `...-Setup.exe` uit het bestand `nauticmixxx-windows-...` onderaan de run (sluit NauticMixxx eerst af). Zet daarna ook de **twee bestanden uit `FLX4-Nautic-v2.7.zip`** in `%LOCALAPPDATA%\NauticMixxx\controllers` (overschrijven): die map gaat voor op de mapping in de installer.
+
+| # | Wat je doet | Wat je hoort te zien |
+|---|---|---|
+| 1 | Deck 1 speelt. Zet op deck 2 een liedje klaar, **BEAT SYNC uit**, en druk **PLAY** | Deck 2 start precies op de plek waar het stond, **zonder** dat het zichzelf op de maat van deck 1 zet. Pas als je **BEAT SYNC** indrukt, volgen tempo en maat |
+| 2 | Druk **BEAT SYNC** met twee spelende liedjes. Open daarna `mixxx.log` en zoek `SYNC-METING` | Tempo en maat komen overeen. In het log staat per deck de BPM, het tempo, de beat-afstand en het **fase-verschil in ms**. Klopt het niet: stuur me die regel plus wat je hoort (loopt het steeds verder uit elkaar, of staat het vast ernaast?) |
+| 3 | Open een playlist op de USB en bekijk de tracklijst | Links staat **#** met **001, 002, ...**: de volgorde zoals rekordbox de lijst naar de USB exporteerde. Sorteer je op artiest of BPM, dan blijven de nummers bij de tracks horen |
+| 4 | Selecteer een playlist links in de browser en kijk naar de lijst rechts | Voor elke track staat eerst het nummer, dan de toonsoort, dan de titel |
+| 5 | Kijk in de balk bovenaan het scherm (links van de klok) | Er staat **CFX** met daarachter de gekozen keten (bijvoorbeeld **FILTER**) |
+| 6 | Druk een paar keer op **SMART CFX** | De naam bovenin wisselt: REVERB, PING PONG, NOISE, FILTER en weer van voren af. Geen lege stand meer. SHIFT + SMART CFX gaat terug |
+| 7 | Zet voor het starten knoppen en schuiven op duidelijke standen en start NauticMixxx; kijk dan in `mixxx.log` naar `STARTSTANDEN` | Staat er niet overal 0, dan neemt het scherm de standen over. Staat er wel overal 0, dan meldt de FLX4 niets na de vraag (de mapping stuurt in 2.7 ook de laadanimatie van de jogs opnieuw, zoals de standaardmapping), en dan zeg me dat |
+| 8 | De punten uit 2.4 tot 2.6 (jog, EQ, CFX, SMART FADER, tempo) | Zie `fork/FLX4-LEESMIJ.md` |
+
+## Eerdere testlijst (versie 2.6)
+
+De bouw was alleen anders in de FLX4-mapping (JavaScript).
 
 | # | Wat je doet | Wat je hoort te zien |
 |---|---|---|
@@ -33,6 +48,9 @@ Als stap 3 faalt (de FLX4 start met de oude NauticMixxx-mapping), stuur me dan d
 - **FLX4-mapping ingebouwd.** `FLX4-Nautic.midi.xml` en `FLX4-Nautic-script.js` zitten in de installer. Voor een DDJ-FLX4 zonder opgeslagen mapping kiest het programma nu deze, dus je hoeft niets meer te selecteren. Dat is ook wat de Raspberry Pi nodig heeft, want die begint zonder profiel. Regel 25 van patch 0016 is hiervoor aangepast.
 - **KEY-kolom, rijnummers en toonsoort in de playlist-preview.** Dit gebeurt in `fork/apply-rx3-key-column.py`. Dat script draait in beide bouwscripts (Linux en Windows) direct nadat de 44 patches zijn toegepast. Het weigert iets te doen als de code afwijkt van wat het verwacht, en je kunt het veilig opnieuw draaien. Ik heb het niet als 45e patch gemaakt, want zowel het Windows-script als `release-audit.py` eisen precies 44 patches.
 - **Kortere jog-uitloop.** Mixxx middelt de jog over 25 audioblokjes; bij jouw buffer van 46 ms is dat bijna 1,2 seconde. `fork/apply-rx3-fork-tweaks.py` maakt daar ongeveer 60 ms van, welke buffer je ook gebruikt.
+- **Geen automatische maat-uitlijning bij PLAY.** Staat Quantize aan (zoals bij jou), dan zette Mixxx een deck dat gaat spelen vanzelf op de maat van het andere spelende deck, ook zonder BEAT SYNC. Hetzelfde script (`apply-rx3-fork-tweaks.py`, `enginebuffer.cpp`) doet dat nu alleen nog als BEAT SYNC aanstaat. Quantize voor cue's en loops blijft werken.
+- **Tracknummers van rekordbox.** De USB-tracklijst kreeg geen kolom **#** (het model had die kolom niet). Nu toont `#` de plaats in de afspeellijst zoals rekordbox hem exporteerde (001, 002, ...), ook na sorteren, en de voorbeeldlijst rechts in de browser begint elke regel met dat nummer. Ook dit zit in `apply-rx3-fork-tweaks.py`.
+- **CFX-naam op het scherm.** In de skin staat in de topbalk **CFX** met de gekozen Sound Color FX-keten (`skins/XDJ_RX3_Mixxx/topbar.xml` en `style.qss`).
 - **Updater naar eigen repo.** De startcontrole keek naar `nauticsoftware/NauticMixxx`. Daarmee kon onze versie je een update van het originele programma aanbieden. In patch 0019 staat nu een plaatshouder, en elke bouw vult de naam van de repo waarin hij draait.
 - **Workflows.** De Windows-bouw draaide alleen in de originele repo; dat is losgelaten. De Raspberry Pi-bouw bewaart het pakket nu standaard (14 dagen).
 
@@ -54,7 +72,7 @@ Alles wat verder in NauticMixxx zit, blijft zoals het was. Mijn eigen tests (22 
 ## Bestanden
 
 - `fork/apply-rx3-key-column.py`: de KEY-wijziging.
-- `fork/apply-rx3-fork-tweaks.py`: de kortere jog-uitloop.
+- `fork/apply-rx3-fork-tweaks.py`: de kortere jog-uitloop, geen maat-uitlijning bij PLAY zonder BEAT SYNC en de tracknummers.
 - `.github/workflows/inspect-mixxx-source.yml`: hulpmiddel om de Mixxx-code na de patches in het log te lezen (bouwt niets).
 - `controllers/Pioneer_DDJ_FLX4_RX3/FLX4-Nautic.*`: onze FLX4-mapping.
 - `fork/FLX4-LEESMIJ.md`: de uitleg van de FLX4-mapping (knoppen, opties).

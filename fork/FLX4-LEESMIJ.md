@@ -1,4 +1,6 @@
-# FLX4 voor NauticMixxx, versie 2.6
+# FLX4 voor NauticMixxx, versie 2.7
+
+Versie 2.7: BEAT SYNC en de automatische maat-uitlijning (nieuwe NauticMixxx-build nodig, zie `EIGEN-FORK-LEESMIJ.md`), de mapping bewaakt dat sync alleen met BEAT SYNC aangaat en schrijft na elke BEAT SYNC-druk een `SYNC-METING` in `mixxx.log`, SMART CFX slaat "geen keten" over en de skin toont de gekozen keten, en bij de eerste echte keep-alive stuurt de mapping ook de laadanimatie van de jogs opnieuw (die `init()` verstuurt maar Mixxx weggooit) vlak voor de vraag naar de startstanden.
 
 Versie 2.6: SMART CFX gebruikt nu het adres uit jouw log (`0x96 0x00`), en het telvenster voor de startstanden begint bij de eerste vraag die de controller echt bereikt (Mixxx gooit alles uit `init()` weg en start de mapping-timers pas ruim 4 seconden later).
 
@@ -14,7 +16,16 @@ Voorbereiding: sluit NauticMixxx, vervang de twee bestanden in `%LOCALAPPDATA%\N
 
 **Belangrijk: kies de mapping zelf.** NauticMixxx start standaard met zijn eigen FLX4-preset, niet met deze. Ctrl+P, **Controllers**, **DDJ-FLX4**, bij **Load Mapping** kies je **Pioneer DDJ-FLX4 - NauticMixxx (eigen)**, **Enabled** aan, **Apply**, **OK**. Daarna NauticMixxx één keer sluiten en weer starten en kijken of hij er nog staat.
 
-**Nieuw in 2.5 en 2.6 (test deze eerst):**
+**Nieuw in 2.7 (test deze eerst; de eerste punten staan ook in `EIGEN-FORK-LEESMIJ.md`):**
+
+| # | Wat je doet | Wat je hoort te zien |
+|---|---|---|
+| K | **PLAY** op een deck terwijl het andere speelt, BEAT SYNC uit | Geen automatische maat-uitlijning; alleen BEAT SYNC doet dat |
+| L | **BEAT SYNC** met twee spelende liedjes, daarna in `mixxx.log` zoeken op `SYNC-METING` | Tempo gelijk, fase-verschil klein (de regel noemt het in ms). Zie je hier een vast verschil, stuur me die regel |
+| M | **SMART CFX** een paar keer, kijk naar de topbalk | CFX REVERB, PING PONG, NOISE, FILTER, zonder lege stand |
+| N | Sync aangezet op het scherm of met het toetsenbord | Gaat meteen weer uit (alleen BEAT SYNC mag het). Wil je dat niet: `syncGuard` op `"off"` (zie onder) |
+
+**Nieuw in 2.5 en 2.6:**
 
 | # | Wat je doet | Wat je hoort te zien |
 |---|---|---|
@@ -125,7 +136,7 @@ Ik kan NauticMixxx hier niet draaien. De logica heb ik getest met een nagebootst
 - **BEAT FX-lijst:** ik ga uit van 8 effecten. Zijn het er meer of minder, pas dan `nativeFxCount` aan.
 - **BEAT ◀ ▶:** parameter 1 van het effect. NauticMixxx heeft een eigen X-PAD voor Beat FX, maar de FLX4 heeft geen touchpad.
 - **Alleen deze pad-modi:** HOT CUE, BEAT LOOP, BEAT JUMP en SAMPLER hebben op de FLX4 pads. Gate cue, Slip loop en Release FX van de RX3 hebben geen eigen FLX4-knop.
-- **Kiezen van een ander Sound Color FX** (reverb, ping pong, noise) via de FLX4 zit er nog niet in, alleen FILTER.
+- **Sound Color FX kiezen:** met SMART CFX (volgende) en SHIFT + SMART CFX (vorige); de naam staat in de topbalk. Het adres `0x96 0x00` voor SMART CFX is bevestigd; SMART FADER (`0x96 0x01`) nog niet.
 
 ## Instellingen aanpassen
 
@@ -137,6 +148,9 @@ Open `FLX4-Nautic-script.js` met Kladblok. Zoek `FLX4RX3.options` (onderin). Sla
 - `infoTurn`: `"tracks"` (standaard) of `"info"` (INFO-regels scrollen, zoals bij NauticMixxx zelf)
 - `fxKeepOnWhenSwitching`: `true` of `false`; `fxRestoreDelayMs`: wachttijd in milliseconden (verhoog naar 150 als het effect na wisselen toch uit blijft)
 - `cfxPreset`: 1 REVERB, 2 PING PONG, 3 NOISE, 4 FILTER, 0 = geen keten laden
+- `cfxPresetCount` en `cfxNames`: hoeveel ketens SMART CFX doorloopt (standaard 4, "geen keten" wordt overgeslagen) en hun namen in het log
+- `syncGuard`: `"block"` (standaard: sync die aangaat zonder BEAT SYNC gaat weer uit en komt in het log), `"log"` (alleen melden) of `"off"`; `syncGuardMs`: hoe lang na een BEAT SYNC-druk sync mag aangaan (1500)
+- `startupReplay`: `true` (standaard) stuurt bij de eerste echte keep-alive de laadanimatie van de jogs opnieuw, vlak voor de vraag naar de startstanden
 - `trimOffset`: 0,25 (standaard, 12 uur is ongeveer -6 dB). 0,35 is zachter, 0,15 luider, 0 is zoals de standaardmapping
 - `nativeFxCount`: aantal effecten in de Beat FX-lijst
 - `fxParamStep`: stapgrootte van BEAT ◀ ▶
