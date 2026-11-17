@@ -29,23 +29,25 @@ jobs:
       - uses: actions/checkout@v4
       - name: Fetch Mixxx 2.5.6 and apply the patches
         run: |
-          curl --fail --location --retry 3 https://github.com/mixxxdj/mixxx/archive/refs/tags/2.5.6.tar.gz -o mixxx.tar.gz
-          printf '%s  %s\n' 9cfc9025d50d2511767ee52a07b8854f75c581f0585197d043bc219fcf9f9050 mixxx.tar.gz | sha256sum -c -
-          tar xzf mixxx.tar.gz
-          cd mixxx-2.5.6
-          for p in ../patches/00[0-9][0-9]-*.patch; do GIT_CEILING_DIRECTORIES=.. git apply --no-index "$p"; done
-          python3 -I ../fork/apply-rx3-key-column.py .
+          # Buiten de checkout werken: binnen een git-repo past 'git apply' paden anders toe.
+          work="$RUNNER_TEMP/mixxx-work"; mkdir -p "$work"
+          curl --fail --location --retry 3 https://github.com/mixxxdj/mixxx/archive/refs/tags/2.5.6.tar.gz -o "$work/mixxx.tar.gz"
+          printf '%s  %s\n' 9cfc9025d50d2511767ee52a07b8854f75c581f0585197d043bc219fcf9f9050 "$work/mixxx.tar.gz" | sha256sum -c -
+          tar xzf "$work/mixxx.tar.gz" -C "$work"
+          cd "$work/mixxx-2.5.6"
+          for p in "$GITHUB_WORKSPACE"/patches/00[0-9][0-9]-*.patch; do GIT_CEILING_DIRECTORIES="$work" git apply --no-index "$p"; done
+          python3 -I "$GITHUB_WORKSPACE/fork/apply-rx3-key-column.py" "$work/mixxx-2.5.6"
       - name: Directory listings
         env:
           DIRS: ${{ inputs.list_dirs }}
         run: |
-          cd mixxx-2.5.6
+          cd "$RUNNER_TEMP/mixxx-work/mixxx-2.5.6"
           for d in $DIRS; do echo "=================== ls $d"; ls -la "$d" 2>&1 | head -80; done
       - name: Grep
         env:
           PATTERNS: ${{ inputs.grep_patterns }}
         run: |
-          cd mixxx-2.5.6
+          cd "$RUNNER_TEMP/mixxx-work/mixxx-2.5.6"
           IFS=$'\n'
           for pat in $(printf '%s' "$PATTERNS" | sed 's/;;/\n/g'); do
             [ -z "$pat" ] && continue
@@ -56,7 +58,7 @@ jobs:
         env:
           FILES: ${{ inputs.files }}
         run: |
-          cd mixxx-2.5.6
+          cd "$RUNNER_TEMP/mixxx-work/mixxx-2.5.6"
           for spec in $FILES; do
             f="${spec%%:*}"; range=""
             case "$spec" in *:*) range="${spec#*:}";; esac
