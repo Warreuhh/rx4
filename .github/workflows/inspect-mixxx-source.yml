@@ -1,0 +1,47 @@
+name: Inspect Mixxx source (hulpmiddel, geen bouw)
+
+# Haalt Mixxx 2.5.6 op, past de NauticMixxx-patches en onze fork-stap toe en drukt
+# alleen de gevraagde stukken code af in het log. Er wordt niets gecompileerd.
+on:
+  workflow_dispatch:
+    inputs:
+      files:
+        description: "Bestanden (relatief aan de Mixxx-bron), gescheiden door spaties"
+        required: true
+        default: "src/util/rotary.cpp src/util/rotary.h"
+      grep_pattern:
+        description: "Optioneel: regex om in src/ te zoeken (toont bestand en regelnummer)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch Mixxx 2.5.6 and apply the patches
+        run: |
+          curl -fsSL -o mixxx.tar.gz https://github.com/mixxxdj/mixxx/archive/refs/tags/2.5.6.tar.gz
+          echo "9cfc9025d50d2511767ee52a07b8854f75c581f0585197d043bc219fcf9f9050  mixxx.tar.gz" | sha256sum -c -
+          tar xzf mixxx.tar.gz
+          cd mixxx-2.5.6
+          for p in ../patches/00[0-9][0-9]-*.patch; do GIT_CEILING_DIRECTORIES=.. git apply --no-index "$p"; done
+          python3 -I ../fork/apply-rx3-key-column.py .
+      - name: Print the requested files
+        env:
+          FILES: ${{ inputs.files }}
+          PATTERN: ${{ inputs.grep_pattern }}
+        run: |
+          cd mixxx-2.5.6
+          for f in $FILES; do
+            echo "=================== $f"
+            if [ -f "$f" ]; then cat -n "$f"; else echo "(bestaat niet)"; fi
+          done
+          if [ -n "$PATTERN" ]; then
+            echo "=================== grep: $PATTERN"
+            grep -rn -E "$PATTERN" src res 2>/dev/null | cut -c1-220 | head -200
+          fi
