@@ -1,4 +1,6 @@
-# FLX4 voor NauticMixxx, versie 2.5
+# FLX4 voor NauticMixxx, versie 2.6
+
+Versie 2.6: SMART CFX gebruikt nu het adres uit jouw log (`0x96 0x00`), en het telvenster voor de startstanden begint bij de eerste vraag die de controller echt bereikt (Mixxx gooit alles uit `init()` weg en start de mapping-timers pas ruim 4 seconden later).
 
 Versie 2.5: de standen van knoppen en schuiven worden bij het opstarten opgehaald en toegepast, de tempo-schuif volgt de schuif zelf (ook na het laden van een liedje), en SMART FADER zet de crossfader uit en aan. Versie 2.4 (jog, EQ, CFX, SMART CFX, sync) staat hieronder.
 
@@ -12,13 +14,14 @@ Voorbereiding: sluit NauticMixxx, vervang de twee bestanden in `%LOCALAPPDATA%\N
 
 **Belangrijk: kies de mapping zelf.** NauticMixxx start standaard met zijn eigen FLX4-preset, niet met deze. Ctrl+P, **Controllers**, **DDJ-FLX4**, bij **Load Mapping** kies je **Pioneer DDJ-FLX4 - NauticMixxx (eigen)**, **Enabled** aan, **Apply**, **OK**. Daarna NauticMixxx één keer sluiten en weer starten en kijken of hij er nog staat.
 
-**Nieuw in 2.5 (test deze eerst):**
+**Nieuw in 2.5 en 2.6 (test deze eerst):**
 
 | # | Wat je doet | Wat je hoort te zien |
 |---|---|---|
-| G | Zet **voor** het starten alles op duidelijke standen: TRIM op driekwart, een EQ-knop helemaal rechts, de CFX-knop links, beide tempo-schuiven op ongeveer +3%, een kanaalfader half. Start dan NauticMixxx met de FLX4 aangesloten en kijk een seconde na het opstarten naar het scherm, **zonder iets aan te raken** | De knoppen en schuiven op het scherm staan zoals de hardware (trim, EQ, CFX, kanaalfaders, crossfader, tempo). Lukt dit niet: open `mixxx.log` en zoek `STARTSTANDEN`. Die regel telt wat de controller binnen 4 seconden doorgaf, per soort. Staat overal 0, dan meldt de FLX4 zijn standen niet na de vraag, en kan geen software het oplossen (zie hieronder) |
+| G | Zet **voor** het starten alles op duidelijke standen: TRIM op driekwart, een EQ-knop helemaal rechts, de CFX-knop links, beide tempo-schuiven op ongeveer +3%, een kanaalfader half. Start dan NauticMixxx met de FLX4 aangesloten en kijk een seconde na het opstarten naar het scherm, **zonder iets aan te raken** | De knoppen en schuiven op het scherm staan zoals de hardware (trim, EQ, CFX, kanaalfaders, crossfader, tempo). Lukt dit niet: open `mixxx.log` en zoek `STARTSTANDEN`. Er staan twee regels: de eerste zegt dat de eerste vraag is verstuurd, de tweede telt wat de controller binnen 4 seconden daarna doorgaf, per soort. Staat overal 0, dan meldt de FLX4 zijn standen niet na de vraag, en kan geen software het oplossen (zie hieronder) |
 | H | Zet een tempo-schuif op +4% (sync uit) en laad een liedje op dat deck | Het liedje start op het tempo van de schuif, zonder dat je de schuif eerst langs het midden hoeft te halen. Is sync aan, dan blijft het tempo van sync |
 | I | Raak een tempo-schuif voor het eerst aan (als G de stand niet doorgaf) | Het tempo springt meteen naar de stand van de schuif; daarna werkt de schuif normaal |
+| D2 | Druk op **SMART CFX** (de knop die in je log als `0x96 0x00` stond) | De CFX-keten springt naar de volgende (zie D hieronder). Doet hij niets of gebeurt er iets anders (bijvoorbeeld de crossfader gaat uit), dan was `0x96 0x00` een andere knop: zeg het me |
 | J | Druk op **SMART FADER** | De crossfader doet niets meer (zoals de THRU-stand van een mixer). Nog een keer drukken zet hem weer aan. Staat in `mixxx.log`: `crossfader UIT (THRU)` of `AAN`. Doet de knop niets: druk een keer op hem en stuur me de regel met `ONBEKENDE KNOP` |
 
 De knopadres van SMART FADER is, net als dat van SMART CFX, nergens openbaar; ik heb een gok erin gezet. Heb je met SMART FADER iets anders bedoeld (bijvoorbeeld het effect dat meekomt als je de fader dichtschuift), zeg het dan.

@@ -966,7 +966,8 @@ FLX4RX3.options = {
     // ingedrukt de vorige. De adressen (status<<8 | noot) van de SMART CFX-knoppen staan nergens
     // openbaar; lukt het niet, druk een keer op de knop en zoek in mixxx.log naar
     // "ONBEKENDE KNOP", dan zet ik het juiste adres hier neer.
-    smartCfxKeys: [0x9651, 0x9609],
+    // 0x9600 is de knop die in jouw log als ONBEKENDE KNOP stond (nog niet bevestigd dat dit SMART CFX is).
+    smartCfxKeys: [0x9600, 0x9651, 0x9609],
     // SMART FADER: zet de crossfader uit (THRU: geen kanaal hangt nog aan links of rechts) en
     // weer aan. Ook dit adres is niet openbaar; staat het verkeerd, druk een keer op de knop en
     // zoek in mixxx.log naar "ONBEKENDE KNOP".
@@ -1286,19 +1287,25 @@ FLX4RX3.skinPadMode = function(deckNumber, control) {
 };
 
 // ---- Standen bij het opstarten ----------------------------------------------------------
-// De FLX4 stuurt zijn knop- en schuifstanden pas door na de SysEx-vraag uit init (en anders bij
-// de eerste beweging). Tijdens het venster telt deze code wat er binnenkomt en schrijft een
-// samenvatting naar mixxx.log; zo is te zien of de controller zijn standen echt meldt.
-FLX4RX3.startup = {active: false, seen: {}, connections: [], timer: 0};
+// De FLX4 stuurt zijn knop- en schuifstanden pas door na de SysEx-vraag (en anders bij de
+// eerste beweging). Let op: Mixxx gooit alle MIDI-berichten uit init() weg ("not open for
+// output"), en de timers van de mapping lopen pas als Mixxx de controllers gaat uitlezen,
+// ruim 4 seconden na init(). De eerste vraag die echt aankomt is dus de eerste keep-alive uit
+// de timer. Het telvenster begint daarom daar, en schrijft daarna een samenvatting in mixxx.log.
+FLX4RX3.startup = {armed: false, active: false, seen: {}, connections: [], timer: 0, t0: 0, first: -1};
 
 FLX4RX3.startupNote = function(kind) {
-    if (!FLX4RX3.startup.active) { return; }
-    FLX4RX3.startup.seen[kind] = (FLX4RX3.startup.seen[kind] || 0) + 1;
+    const s = FLX4RX3.startup;
+
+    if (!s.active) { return; }
+    s.seen[kind] = (s.seen[kind] || 0) + 1;
+    if (s.first < 0) { s.first = Date.now() - s.t0; }
 };
 
 FLX4RX3.startupStop = function() {
     const s = FLX4RX3.startup;
 
+    s.armed = false;
     s.active = false;
     if (s.timer) { engine.stopTimer(s.timer); s.timer = 0; }
     s.connections.forEach(function(c) { if (c && c.disconnect) { c.disconnect(); } });
@@ -1306,28 +1313,46 @@ FLX4RX3.startupStop = function() {
 };
 
 FLX4RX3.startupReport = function() {
-    const seen = FLX4RX3.startup.seen;
+    const s = FLX4RX3.startup;
     const kinds = ["trim", "eq", "cfx", "tempo", "fader", "crossfader"];
     let total = 0;
-    const parts = kinds.map(function(k) { total += seen[k] || 0; return k + " " + (seen[k] || 0); });
+    const parts = kinds.map(function(k) { total += s.seen[k] || 0; return k + " " + (s.seen[k] || 0); });
+    const first = s.first;
 
-    FLX4RX3.startup.timer = 0;
+    s.timer = 0;
     FLX4RX3.startupStop();
-    FLX4RX3.log("STARTSTANDEN binnen " + FLX4RX3.options.startupWindowMs + " ms van de controller: " + parts.join(", ") +
-        (total > 0 ? "" : " -> de controller meldt geen standen na de vraag; regelaars nemen over bij de eerste beweging"));
+    FLX4RX3.log("STARTSTANDEN binnen " + FLX4RX3.options.startupWindowMs + " ms na de eerste vraag: " + parts.join(", ") +
+        (total > 0 ? " (eerste antwoord na " + first + " ms)" :
+            " -> de controller meldt geen standen na de vraag; regelaars nemen over bij de eerste beweging"));
 };
 
 FLX4RX3.startStartupSync = function() {
+    if (!FLX4RX3.options.startupSync) { return; }
+    FLX4RX3.startup.armed = true;
+    FLX4RX3.startup.seen = {};
+};
+
+FLX4RX3.startupAnchor = function() {
     const s = FLX4RX3.startup;
 
-    if (!FLX4RX3.options.startupSync) { return; }
+    if (!s.armed) { return; }
+    s.armed = false;
     s.active = true;
     s.seen = {};
+    s.first = -1;
+    s.t0 = Date.now();
     [["[Channel1]", "volume", "fader"], ["[Channel2]", "volume", "fader"], ["[Master]", "crossfader", "crossfader"]].forEach(
         function(item) {
             s.connections.push(engine.makeConnection(item[0], item[1], function() { FLX4RX3.startupNote(item[2]); }));
         });
     s.timer = engine.beginTimer(FLX4RX3.options.startupWindowMs, FLX4RX3.startupReport, true);
+    FLX4RX3.log("STARTSTANDEN: eerste vraag aan de controller verstuurd, telvenster open");
+};
+
+// De vraag aan de controller (uit Wireshark, ongewijzigd); doet ook dienst als keep-alive.
+FLX4RX3.sendKeepAlive = function() {
+    midi.sendSysexMsg([0xF0, 0x00, 0x40, 0x05, 0x00, 0x00, 0x04, 0x05, 0x00, 0x50, 0x02, 0xf7], 12);
+    FLX4RX3.startupAnchor();
 };
 
 // ---- Tempo-schuif: de schuif is het tempo -----------------------------------------------
