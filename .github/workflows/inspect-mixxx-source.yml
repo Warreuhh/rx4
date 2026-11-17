@@ -49,11 +49,11 @@ jobs:
         run: |
           cd "$RUNNER_TEMP/mixxx-work/mixxx-2.5.6"
           IFS=$'\n'
-          # Patroon mag 'map::regex::aantal-regels-erna' zijn; zonder map wordt src en res doorzocht.
+          # Patroon mag map@@regex@@aantal-regels-erna zijn; zonder map wordt src en res doorzocht.
           for pat in $(printf '%s' "$PATTERNS" | sed 's/;;/\n/g'); do
             [ -z "$pat" ] && continue
             dir="src res"; ctx=0; rx="$pat"
-            case "$pat" in *::*) dir="${pat%%::*}"; rest="${pat#*::}"; rx="${rest%%::*}"; case "$rest" in *::*) ctx="${rest##*::}";; esac;; esac
+            case "$pat" in *@@*) dir="${pat%%@@*}"; rest="${pat#*@@}"; rx="${rest%%@@*}"; case "$rest" in *@@*) ctx="${rest##*@@}";; esac;; esac
             echo "=================== grep: $rx in $dir (+$ctx)"
             grep -rn -E -A"$ctx" -- "$rx" $dir 2>/dev/null | cut -c1-230 | head -250
           done
