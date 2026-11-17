@@ -37,6 +37,8 @@ if [ "$(cat "$marker")" != "$digest" ] || [ ! -f "$source_tree/src/test/trackcap
 fi
 # Eigen fork: KEY-kolom en toonsoort in de playlist-preview (veilig om opnieuw te draaien).
 python3 -I "$project/fork/apply-rx3-key-column.py" "$source_tree"
+# Eigen fork: kortere jog-uitloop (veilig om opnieuw te draaien).
+python3 -I "$project/fork/apply-rx3-fork-tweaks.py" "$source_tree"
 # Branding must be applied before Qt compiles its resource collection.
 python3 "$project/packaging/linux/prepare-branding.py" "$source_tree" "$project"
 cmake -S "$source_tree" -B "$work/native" -G Ninja \

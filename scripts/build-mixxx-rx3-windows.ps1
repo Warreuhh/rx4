@@ -83,6 +83,8 @@ try {
     }
     # Eigen fork: KEY-kolom en toonsoort in de playlist-preview (veilig om opnieuw te draaien).
     Invoke-Checked -File python -Arguments @('-I', (Join-Path $projectRoot 'fork\apply-rx3-key-column.py'), $source)
+    # Eigen fork: kortere jog-uitloop (veilig om opnieuw te draaien).
+    Invoke-Checked -File python -Arguments @('-I', (Join-Path $projectRoot 'fork\apply-rx3-fork-tweaks.py'), $source)
     $windowsIcon = Join-Path $source 'res\images\icons\ic_mixxx.ico'
     Invoke-Checked -File python -Arguments @((Join-Path $PSScriptRoot 'prepare-app-branding.py'), $source, $projectRoot)
     Invoke-Checked -File python -Arguments @((Join-Path $PSScriptRoot 'build-app-icon-windows.py'), $windowsIcon)

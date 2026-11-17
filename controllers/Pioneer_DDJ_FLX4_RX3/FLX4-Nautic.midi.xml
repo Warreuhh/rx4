@@ -3,7 +3,7 @@
     <info>
         <name>Pioneer DDJ-FLX4 - NauticMixxx (eigen)</name>
         <author>Eigen mapping voor NauticMixxx, gebaseerd op Pioneer DDJ-FLX4 (Robert904 e.a.) en NauticMixxx' FLX4-bestanden</author>
-        <description>Pioneer DDJ-FLX4 voor NauticMixxx (versie 2.3): BROWSE, LOAD, Beat FX, CFX, TRIM, PLAY (vinyl-stop) en pad-pagina's volgens de RX3-skin.</description>
+        <description>Pioneer DDJ-FLX4 voor NauticMixxx (versie 2.4): BROWSE, LOAD, Beat FX, CFX, SMART CFX, EQ (Pioneer-curve), TRIM, PLAY (vinyl-stop) en pad-pagina's volgens de RX3-skin.</description>
     </info>
     <controller id="DDJ-FLX4">
         <scriptfiles>
@@ -755,124 +755,124 @@
 
 
             <control>
-                <description>EQ HI - rotate</description>
+                <description>EQ HI (DECK1) - rotate (LSB)</description>
                 <group>[EqualizerRack1_[Channel1]_Effect1]</group>
-                <key>parameter3</key>
+                <key>FLX4RX3.eqLsb</key>
                 <status>0xB0</status>
                 <midino>0x27</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ MID - rotate</description>
+                <description>EQ MID (DECK1) - rotate (LSB)</description>
                 <group>[EqualizerRack1_[Channel1]_Effect1]</group>
-                <key>parameter2</key>
+                <key>FLX4RX3.eqLsb</key>
                 <status>0xB0</status>
                 <midino>0x2B</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ LOW - rotate</description>
+                <description>EQ LOW (DECK1) - rotate (LSB)</description>
                 <group>[EqualizerRack1_[Channel1]_Effect1]</group>
-                <key>parameter1</key>
+                <key>FLX4RX3.eqLsb</key>
                 <status>0xB0</status>
                 <midino>0x2F</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ HI - rotate</description>
+                <description>EQ HI (DECK1) - rotate (MSB) - Pioneer-curve</description>
                 <group>[EqualizerRack1_[Channel1]_Effect1]</group>
-                <key>parameter3</key>
+                <key>FLX4RX3.eqMsb</key>
                 <status>0xB0</status>
                 <midino>0x07</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ MID - rotate</description>
+                <description>EQ MID (DECK1) - rotate (MSB) - Pioneer-curve</description>
                 <group>[EqualizerRack1_[Channel1]_Effect1]</group>
-                <key>parameter2</key>
+                <key>FLX4RX3.eqMsb</key>
                 <status>0xB0</status>
                 <midino>0x0B</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ LOW - rotate</description>
+                <description>EQ LOW (DECK1) - rotate (MSB) - Pioneer-curve</description>
                 <group>[EqualizerRack1_[Channel1]_Effect1]</group>
-                <key>parameter1</key>
+                <key>FLX4RX3.eqMsb</key>
                 <status>0xB0</status>
                 <midino>0x0F</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
 
             <control>
-                <description>EQ HI - rotate</description>
+                <description>EQ HI (DECK2) - rotate (LSB)</description>
                 <group>[EqualizerRack1_[Channel2]_Effect1]</group>
-                <key>parameter3</key>
+                <key>FLX4RX3.eqLsb</key>
                 <status>0xB1</status>
                 <midino>0x27</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ MID - rotate</description>
+                <description>EQ MID (DECK2) - rotate (LSB)</description>
                 <group>[EqualizerRack1_[Channel2]_Effect1]</group>
-                <key>parameter2</key>
+                <key>FLX4RX3.eqLsb</key>
                 <status>0xB1</status>
                 <midino>0x2B</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ LOW - rotate</description>
+                <description>EQ LOW (DECK2) - rotate (LSB)</description>
                 <group>[EqualizerRack1_[Channel2]_Effect1]</group>
-                <key>parameter1</key>
+                <key>FLX4RX3.eqLsb</key>
                 <status>0xB1</status>
                 <midino>0x2F</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ HI - rotate</description>
+                <description>EQ HI (DECK2) - rotate (MSB) - Pioneer-curve</description>
                 <group>[EqualizerRack1_[Channel2]_Effect1]</group>
-                <key>parameter3</key>
+                <key>FLX4RX3.eqMsb</key>
                 <status>0xB1</status>
                 <midino>0x07</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ MID - rotate</description>
+                <description>EQ MID (DECK2) - rotate (MSB) - Pioneer-curve</description>
                 <group>[EqualizerRack1_[Channel2]_Effect1]</group>
-                <key>parameter2</key>
+                <key>FLX4RX3.eqMsb</key>
                 <status>0xB1</status>
                 <midino>0x0B</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>EQ LOW - rotate</description>
+                <description>EQ LOW (DECK2) - rotate (MSB) - Pioneer-curve</description>
                 <group>[EqualizerRack1_[Channel2]_Effect1]</group>
-                <key>parameter1</key>
+                <key>FLX4RX3.eqMsb</key>
                 <status>0xB1</status>
                 <midino>0x0F</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
 
@@ -921,43 +921,43 @@
 
             <!-- EFFECT Section START -->
             <control>
-                <description>FILTER CH1 - rotate - Filter Effect Knob</description>
+                <description>CFX (DECK1) - rotate (MSB) - vlak rond 12 uur</description>
                 <group>[QuickEffectRack1_[Channel1]]</group>
-                <key>super1</key>
+                <key>FLX4RX3.cfxMsb</key>
                 <status>0xB6</status>
                 <midino>0x17</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>FILTER CH1 - rotate - Filter Effect Knob</description>
+                <description>CFX (DECK1) - rotate (LSB)</description>
                 <group>[QuickEffectRack1_[Channel1]]</group>
-                <key>super1</key>
+                <key>FLX4RX3.cfxLsb</key>
                 <status>0xB6</status>
                 <midino>0x37</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>FILTER CH2 - rotate - Filter Effect Knob</description>
+                <description>CFX (DECK2) - rotate (MSB) - vlak rond 12 uur</description>
                 <group>[QuickEffectRack1_[Channel2]]</group>
-                <key>super1</key>
+                <key>FLX4RX3.cfxMsb</key>
                 <status>0xB6</status>
                 <midino>0x18</midino>
                 <options>
-                    <fourteen-bit-msb/>
+                    <Script-Binding/>
                 </options>
             </control>
             <control>
-                <description>FILTER CH2 - rotate - Filter Effect Knob</description>
+                <description>CFX (DECK2) - rotate (LSB)</description>
                 <group>[QuickEffectRack1_[Channel2]]</group>
-                <key>super1</key>
+                <key>FLX4RX3.cfxLsb</key>
                 <status>0xB6</status>
                 <midino>0x38</midino>
                 <options>
-                    <fourteen-bit-lsb/>
+                    <Script-Binding/>
                 </options>
             </control>
 
@@ -2282,6 +2282,1228 @@
                 <key>FLX4RX3.shiftLoad2</key>
                 <status>0x96</status>
                 <midino>0x7A</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+
+            <!-- Knoppen van het mengpaneel (0x96) die de mapping niet gebruikt: SMART CFX en leerhulp -->
+            <control>
+                <description>mengpaneel knop 0x00 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x00</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x01 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x01</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x02 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x02</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x03 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x03</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x04 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x04</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x05 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x05</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x06 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x06</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x07 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x07</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x08 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x08</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x09 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x09</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x0A - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x0A</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x0B - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x0B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x0C - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x0C</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x0D - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x0D</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x0E - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x0E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x0F - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x0F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x10 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x10</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x11 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x11</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x12 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x12</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x13 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x13</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x14 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x14</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x15 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x15</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x16 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x16</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x17 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x17</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x18 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x18</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x19 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x19</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x1A - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x1A</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x1B - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x1B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x1C - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x1C</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x1D - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x1D</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x1E - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x1E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x1F - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x1F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x20 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x20</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x21 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x21</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x22 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x22</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x23 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x23</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x24 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x24</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x25 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x25</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x26 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x26</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x27 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x27</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x28 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x28</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x29 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x29</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x2A - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x2A</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x2B - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x2B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x2C - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x2C</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x2D - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x2D</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x2E - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x2E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x2F - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x2F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x30 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x30</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x31 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x31</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x32 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x32</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x33 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x33</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x34 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x34</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x35 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x35</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x36 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x36</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x37 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x37</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x38 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x38</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x39 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x39</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x3A - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x3A</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x3B - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x3B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x3C - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x3C</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x3D - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x3D</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x3E - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x3E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x3F - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x3F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x40 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x40</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x43 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x43</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x44 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x44</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x45 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x45</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x48 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x48</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x49 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x49</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x4A - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x4A</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x4B - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x4B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x4C - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x4C</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x4D - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x4D</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x4E - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x4E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x4F - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x4F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x50 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x50</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x51 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x51</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x52 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x52</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x53 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x53</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x54 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x54</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x55 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x55</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x56 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x56</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x57 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x57</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x58 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x58</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x59 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x59</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x5A - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x5A</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x5B - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x5B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x5C - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x5C</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x5D - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x5D</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x5E - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x5E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x5F - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x5F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x60 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x60</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x61 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x61</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x62 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x62</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x63 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x63</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x64 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x64</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x65 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x65</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x66 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x66</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x67 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x67</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x69 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x69</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x6A - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x6A</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x6B - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x6B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x6C - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x6C</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x6D - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x6D</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x6E - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x6E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x6F - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x6F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x70 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x70</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x71 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x71</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x72 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x72</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x73 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x73</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x74 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x74</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x75 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x75</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x76 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x76</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x77 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x77</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x78 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x78</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x79 - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x79</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x7B - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x7B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x7C - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x7C</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x7D - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x7D</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x7E - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x7E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control>
+                <description>mengpaneel knop 0x7F - SMART CFX of onbekend</description>
+                <group>[Master]</group>
+                <key>FLX4RX3.unmappedButton</key>
+                <status>0x96</status>
+                <midino>0x7F</midino>
                 <options>
                     <Script-Binding/>
                 </options>

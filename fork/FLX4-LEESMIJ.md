@@ -1,4 +1,4 @@
-# FLX4 voor NauticMixxx, versie 2.3
+# FLX4 voor NauticMixxx, versie 2.4
 
 Versie 2.3: SHIFT + BROWSE (kort) is nu BACK, en draaien aan BROWSE in het deck-beeld zoomt de golfvormen in plaats van de browser te openen. TRIM blijft op -6 dB bij 12 uur (zoals versie 2.2).
 
@@ -10,7 +10,20 @@ Voorbereiding: sluit NauticMixxx, vervang de twee bestanden in `%LOCALAPPDATA%\N
 
 **Belangrijk: kies de mapping zelf.** NauticMixxx start standaard met zijn eigen FLX4-preset, niet met deze. Ctrl+P, **Controllers**, **DDJ-FLX4**, bij **Load Mapping** kies je **Pioneer DDJ-FLX4 - NauticMixxx (eigen)**, **Enabled** aan, **Apply**, **OK**. Daarna NauticMixxx één keer sluiten en weer starten en kijken of hij er nog staat.
 
-**Nieuw in 2.3:**
+**Nieuw in 2.4 (test deze eerst):**
+
+| # | Wat je doet | Wat je hoort te zien |
+|---|---|---|
+| A | Duw een jogwheel vooruit, hou hem aan en laat los (daarna ook: alleen de rand aanraken en loslaten) | Het liedje stopt of gaat meteen terug naar normaal op het moment dat het wiel stilstaat; geen uitrollen in de software meer |
+| B | Draai een EQ-knop (HI, MID of LOW) langzaam van links naar rechts | Links: sterk gedempt maar niet helemaal dood (zoals de Pioneer, -26 dB). 12 uur: onveranderd. Rechts: een lichte boost (+6 dB, was +12) |
+| C | Draai de CFX-knop van 12 uur naar links en naar rechts | Rond 12 uur klinkt niets (klikvlak), daarbuiten loopt het filter soepel tot het uiteinde |
+| D | Druk op **SMART CFX** | De CFX-keten springt naar de volgende (1 REVERB, 2 PING PONG, 3 NOISE, 4 FILTER) voor beide kanalen. SHIFT + SMART CFX gaat terug. Zie mixxx.log: `SMART CFX: keten N` |
+| E | Als D niets doet: druk **een keer** op elke SMART CFX-knop, open `mixxx.log` en zoek `ONBEKENDE KNOP` | Er staat een regel met `status=0x96 noot=0x..`; stuur me die regels. De knopadressen van de FLX4 zijn nergens openbaar, dus ik heb er twee gokken in gezet |
+| F | Zet sync op deck 1 aan met BEAT SYNC, laad daarna een ander liedje op deck 1 | De sync-knop staat na het laden uit en het nieuwe liedje start op zijn eigen tempo. Alleen BEAT SYNC zet sync weer aan |
+
+Instellingen voor dit alles staan bovenin het scriptbestand (`jogReleaseRamp`, `eqMode`, `eqCutDb`, `eqBoostDb`, `cfxDeadzone`, `smartCfxKeys`, `syncOnLoad`). Zet `eqMode` op `"mixxx"` voor de oude EQ.
+
+**Eerder, in 2.3:**
 
 | # | Wat je doet | Wat je hoort te zien |
 |---|---|---|

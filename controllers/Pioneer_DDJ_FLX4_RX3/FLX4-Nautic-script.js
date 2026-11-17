@@ -659,7 +659,7 @@ FLX4RX3.jogTouch = function(channel, _control, value) {
     if (value !== 0 && this.vinylMode) {
         engine.scratchEnable(deckNum, 720, 33+1/3, this.alpha, this.beta);
     } else {
-        engine.scratchDisable(deckNum);
+        engine.scratchDisable(deckNum, FLX4RX3.options.jogReleaseRamp);
     }
 };
 
@@ -948,6 +948,31 @@ FLX4RX3.options = {
     // het uiteinde rechts blijft +12 dB. 0 = zoals de standaardmapping (12 uur = 0 dB).
     // Nog zachter: 0.35. Luider: 0.15.
     trimOffset: 0.25,
+    // JOGWHEEL loslaten: false = de deck stopt meteen met scratchen (geen uitrollen in de software
+    // terwijl het wiel zelf al stilstaat). true = zoals standaard Mixxx (rolt zacht uit).
+    jogReleaseRamp: false,
+    // EQ (HI / MID / LOW): "pioneer" = links -26 dB, 12 uur = 0 dB, rechts +6 dB (zoals de DDJ-FLX4);
+    // "mixxx" = standaard Mixxx (helemaal links = kill, rechts +12 dB).
+    eqMode: "pioneer",
+    eqCutDb: 26,            // maximale demping links (dB)
+    eqBoostDb: 6,           // maximale versterking rechts (dB)
+    eqCutCurve: 1.0,        // 1 = rechte lijn in dB; hoger = meer gevoel vlak bij 12 uur
+    eqBoostCurve: 1.0,
+    eqCenterDeadzone: 0.012, // klein vlak rond 12 uur dat exact 0 dB is (de klik van de knop)
+    // CFX-knop: vlak rond 12 uur waar het effect helemaal uit is (zoals de klik op de Pioneer).
+    // Daarbuiten loopt de knop weer van 0 tot vol. 0 = geen vlak.
+    cfxDeadzone: 0.04,
+    // SMART CFX: kiest met elke druk de volgende CFX-keten (voor beide kanalen); met SHIFT
+    // ingedrukt de vorige. De adressen (status<<8 | noot) van de SMART CFX-knoppen staan nergens
+    // openbaar; lukt het niet, druk een keer op de knop en zoek in mixxx.log naar
+    // "ONBEKENDE KNOP", dan zet ik het juiste adres hier neer.
+    smartCfxKeys: [0x9651, 0x9609],
+    logUnknownButtons: true,
+    // Sync na het laden van een liedje: "off" = sync gaat uit (alleen BEAT SYNC zet hem aan; het
+    // nieuwe liedje start op zijn eigen tempo), "keep" = zoals Mixxx (sync blijft aan).
+    syncOnLoad: "off",
+    // Bij "off": ook de tempo-stand terug op 0 als sync het tempo had aangepast.
+    syncResetRate: true,
     // Meldingen in mixxx.log (zet op false als alles werkt).
     debug: true
 };
@@ -1252,6 +1277,10 @@ FLX4RX3.initRx3 = function() {
     engine.setValue(FLX4RX3.fxUnit, "focused_effect", 1);
     engine.makeConnection(FLX4RX3.fxUnit, "enabled", FLX4RX3.toggleFxLight);
 
+    // Sync gaat uit bij het laden van een liedje
+    engine.makeConnection("[Channel1]", "track_loaded", FLX4RX3.trackLoadedSync);
+    engine.makeConnection("[Channel2]", "track_loaded", FLX4RX3.trackLoadedSync);
+
     // NauticMixxx zet zijn gebruikersinstellingen terug nadat de mapping klaar is
     FLX4RX3.enc.init();
 
@@ -1312,6 +1341,178 @@ FLX4RX3.trimLsb = function(_channel, _control, value, _status, group) {
     FLX4RX3.trimState.lsb[group] = value;
     FLX4RX3.trimApply(group);
 };
+
+// ---- EQ (HI / MID / LOW) ----------------------------------------------------------
+// De knoppen sturen 14 bits (MSB + LSB). Standaard gaat de knopstand rechtstreeks naar
+// Mixxx' "Biquad Full Kill" EQ: links = kill, 12 uur = 0 dB, rechts = +12 dB. De Pioneer
+// doet links -26 dB en rechts +6 dB. Hier wordt de knopstand daarom eerst omgerekend naar
+// de dB-waarde van de Pioneer en daarna naar de parameter die Mixxx daarvoor nodig heeft.
+FLX4RX3.eqState = {msb: {}, lsb: {}};
+FLX4RX3.eqBand = {0x07: 3, 0x27: 3, 0x0B: 2, 0x2B: 2, 0x0F: 1, 0x2F: 1}; // HI=3, MID=2, LOW=1
+
+// Gewenste versterking in dB voor knopstand x (0..1, 0.5 = 12 uur).
+FLX4RX3.eqTargetDb = function(x) {
+    const o = FLX4RX3.options;
+
+    if (Math.abs(x - 0.5) <= o.eqCenterDeadzone) { return 0; }
+    if (x < 0.5) {
+        return -o.eqCutDb * Math.pow(1 - x / 0.5, o.eqCutCurve);
+    }
+    return o.eqBoostDb * Math.pow((x - 0.5) / 0.5, o.eqBoostCurve);
+};
+
+// Totale demping in dB van Mixxx' EQ bij waarde v (1 = 0 dB): tot v = 0,25 (-12 dB) precies
+// 20*log10(v); daaronder komt de kill-filter erbij (-23 dB) en de isolator die de band wegdraait.
+FLX4RX3.eqActualDb = function(v) {
+    if (v >= 0.25) { return 20 * Math.log10(v); }
+    return (-23 + 12) * (1 - v / 0.25) - 12 + 20 * Math.log10(v / 0.25);
+};
+
+// Waarde v (verhouding) waarbij Mixxx' EQ de gevraagde dB levert.
+FLX4RX3.eqRatioFor = function(db) {
+    if (db >= -12) { return Math.pow(10, db / 20); }
+
+    let lowRatio = 0.0005;
+    let highRatio = 0.25;
+
+    for (let i = 0; i < 40; ++i) {
+        const midRatio = (lowRatio + highRatio) / 2;
+        if (FLX4RX3.eqActualDb(midRatio) < db) { lowRatio = midRatio; } else { highRatio = midRatio; }
+    }
+    return (lowRatio + highRatio) / 2;
+};
+
+// Parameter (0..1) van Mixxx' effectknop voor waarde v. Zelfde formules als Mixxx'
+// "audio taper" voor EQ-knoppen: -12 dB .. +12,04 dB met 0 dB op 0,5.
+FLX4RX3.eqParameterForRatio = function(v) {
+    if (v < 1) {
+        const offset = Math.pow(10, -12 / 20);
+        const overlay = offset * (1 - v);
+        return (20 * Math.log10(v + overlay) + 12) / 12 * 0.5;
+    }
+    if (v === 1) { return 0.5; }
+    return Math.min(1, 0.5 + 20 * Math.log10(v) / 12.0412 * 0.5);
+};
+
+FLX4RX3.eqParameter = function(x) {
+    if (FLX4RX3.options.eqMode !== "pioneer") { return x; }
+    return FLX4RX3.eqParameterForRatio(FLX4RX3.eqRatioFor(FLX4RX3.eqTargetDb(x)));
+};
+
+FLX4RX3.eqApply = function(group, band, id) {
+    const msb = FLX4RX3.eqState.msb[id] || 0;
+    const lsb = FLX4RX3.eqState.lsb[id] || 0;
+    const x = ((msb << 7) | lsb) / 16383;
+
+    engine.setParameter(group, "parameter" + band, FLX4RX3.eqParameter(x));
+};
+
+FLX4RX3.eqMsb = function(_channel, control, value, _status, group) {
+    const band = FLX4RX3.eqBand[control];
+    const id = group + band;
+
+    FLX4RX3.eqState.msb[id] = value;
+    FLX4RX3.eqApply(group, band, id);
+};
+
+FLX4RX3.eqLsb = function(_channel, control, value, _status, group) {
+    const band = FLX4RX3.eqBand[control];
+    const id = group + band;
+
+    FLX4RX3.eqState.lsb[id] = value;
+    FLX4RX3.eqApply(group, band, id);
+};
+
+// ---- CFX-knop met vlak rond 12 uur -------------------------------------------------
+FLX4RX3.cfxState = {msb: {}, lsb: {}};
+
+FLX4RX3.cfxShape = function(x) {
+    const zone = Math.min(0.2, Math.max(0, FLX4RX3.options.cfxDeadzone));
+    const distance = Math.abs(x - 0.5);
+
+    if (distance <= zone) { return 0.5; }
+    const scaled = (distance - zone) / (0.5 - zone) * 0.5;
+    return x < 0.5 ? 0.5 - scaled : 0.5 + scaled;
+};
+
+FLX4RX3.cfxApply = function(group) {
+    const msb = FLX4RX3.cfxState.msb[group] || 0;
+    const lsb = FLX4RX3.cfxState.lsb[group] || 0;
+
+    engine.setParameter(group, "super1", FLX4RX3.cfxShape(((msb << 7) | lsb) / 16383));
+};
+
+FLX4RX3.cfxMsb = function(_channel, _control, value, _status, group) {
+    FLX4RX3.cfxState.msb[group] = value;
+    FLX4RX3.cfxApply(group);
+};
+
+FLX4RX3.cfxLsb = function(_channel, _control, value, _status, group) {
+    FLX4RX3.cfxState.lsb[group] = value;
+    FLX4RX3.cfxApply(group);
+};
+
+// ---- SMART CFX: de CFX-keten kiezen ---------------------------------------------------
+// Keten 1 REVERB, 2 PING PONG, 3 NOISE, 4 FILTER (NauticMixxx' lijst met Sound Color FX).
+FLX4RX3.smartCfxStep = function(direction) {
+    const key = direction > 0 ? "next_chain_preset" : "prev_chain_preset";
+
+    for (let deck = 1; deck <= 2; ++deck) {
+        const group = "[QuickEffectRack1_[Channel" + deck + "]]";
+
+        FLX4RX3.pulseValue(group, key, 1);
+    }
+    // Een nieuwe keten kan uitstaan: zet hem na het laden weer aan.
+    engine.beginTimer(80, function() {
+        for (let deck = 1; deck <= 2; ++deck) {
+            const group = "[QuickEffectRack1_[Channel" + deck + "]]";
+
+            engine.setValue(group, "enabled", 1);
+        }
+        FLX4RX3.log("SMART CFX: keten " + engine.getValue("[QuickEffectRack1_[Channel1]]", "loaded_chain_preset") +
+            " (1 REVERB, 2 PING PONG, 3 NOISE, 4 FILTER)");
+    }, true);
+};
+
+FLX4RX3.smartCfxPressed = function() {
+    const shifted = FLX4RX3.shiftButtonDown[0] || FLX4RX3.shiftButtonDown[1];
+
+    FLX4RX3.smartCfxStep(shifted ? -1 : 1);
+};
+
+// Alle knoppen van het mengpaneel (status 0x96) die de mapping niet gebruikt, komen hier uit.
+// Zo vangt de mapping de SMART CFX-knop op, en laat hij in mixxx.log zien welk adres een
+// onbekende knop heeft.
+FLX4RX3.unmappedButton = function(_channel, control, value, status, _group) {
+    const down = value > 0 && (status & 0xF0) !== 0x80;
+
+    if (!down) { return; }
+    const key = ((status & 0xFF) << 8) | (control & 0xFF);
+
+    if (FLX4RX3.options.smartCfxKeys.indexOf(key) >= 0) {
+        FLX4RX3.smartCfxPressed();
+        return;
+    }
+    if (FLX4RX3.options.logUnknownButtons) {
+        FLX4RX3.log("ONBEKENDE KNOP status=0x" + (status & 0xFF).toString(16) + " noot=0x" + (control & 0xFF).toString(16));
+    }
+};
+
+// ---- Sync alleen met BEAT SYNC ----------------------------------------------------------
+// Mixxx laat de sync-knop van een deck aan staan als je een nieuw liedje laadt; het nieuwe
+// liedje neemt dan zelf het tempo over. Hier gaat sync bij het laden uit.
+FLX4RX3.trackLoadedSync = function(value, group) {
+    if (value <= 0 || FLX4RX3.options.syncOnLoad !== "off") { return; }
+    if (engine.getValue(group, "sync_enabled") <= 0) { return; }
+
+    engine.setValue(group, "sync_enabled", 0);
+    if (FLX4RX3.options.syncResetRate) {
+        engine.softTakeoverIgnoreNextValue(group, "rate");
+        engine.setValue(group, "rate", 0);
+    }
+    FLX4RX3.log("sync uit na laden op " + group + " (alleen BEAT SYNC zet hem aan)");
+};
+
 
 FLX4RX3.shutdownRx3 = function() {
     FLX4RX3.cancelFxRestore();
